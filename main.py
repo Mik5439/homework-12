@@ -28,16 +28,12 @@ class Phone(Field):
         if not self.is_valid(value):
             raise ValueError("Incorrect phone number formatу")
         super().__init__(value)
-
+    
     @staticmethod
     def is_valid(value):
         return value.isdigit() and len(value) == 10
 
 class Birthday(Field):
-    def __init__(self, value):
-        self.__value = None
-        self.value = value
-
     @property
     def value(self):
         return self.__value
@@ -116,14 +112,15 @@ class AddressBook(UserDict):
             end = start + page_number
             yield records[start:end]
 
-    def save_address_book(self):
-        with open('data.pickle', 'wb') as file:
-            pickle.dump(self, file)
+    def save_address_book(self, filename):
+        with open(filename, 'wb') as file:
+            pickle.dump(self.data, file)
         print('Address book saved successfully')
 
-    def load_address_book(self):
-        with open('data.pickle', 'rb') as file:
-            return pickle.load(file)
+    def load_address_book(self, filename):
+        with open(filename, 'rb') as file:
+            self.data = pickle.load(file)
+        print('Address book load successfully')
         
     def search(self, word):
         found_list = []
@@ -137,4 +134,3 @@ class AddressBook(UserDict):
                         found_list.append(record.name)
                         continue
         print(found_list)
-

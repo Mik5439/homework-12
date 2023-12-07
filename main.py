@@ -1,19 +1,21 @@
 from collections import UserDict
 from datetime import datetime
 import pickle
+import re
 
 
 class Field:
     def __init__(self, value):
+        self.__value = value
         self.value = value
-
+    
     @property
     def value(self):
-        return self._value
+        return self.__value
 
     @value.setter
     def value(self, new_value):
-        self._value = new_value
+        self.__value = new_value
     
     def __str__(self):
         return str(self.value)
@@ -24,14 +26,15 @@ class Name(Field):
         super().__init__(value)
 
 class Phone(Field):
-    def __init__(self, value):
-        if not self.is_valid(value):
-            raise ValueError("Incorrect phone number formatу")
-        super().__init__(value)
+    @property
+    def value(self):
+        return self.__value
     
-    @staticmethod
-    def is_valid(value):
-        return value.isdigit() and len(value) == 10
+    @value.setter
+    def value(self, value):
+        if not bool(re.match(r"\d{10}", value)) or len(value) > 10:
+            raise ValueError("Incorrect phone number formatу")
+        self.__value = value
 
 class Birthday(Field):
     @property
@@ -69,7 +72,6 @@ class Record:
         for phone in self.phones:
             if phone.value == old_phone:
                 phone.value = new_phone
-                phone.is_valid(phone.value)
                 found = True
                 break
         if not found:
